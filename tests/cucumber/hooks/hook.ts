@@ -39,10 +39,12 @@ const username = process.env.RUDDERSTACK_USERNAME;
     if (!username || !password) {
       throw new Error("Rudderstack username or password environment variables are not set.");
     }
+    console.log(`RUDDERSTACK_USERNAME (from username variable): ${username}`);
+console.log(`RUDDERSTACK_PASSWORD (from password variable): ${password}`);
     await loginPage.navigateToLoginPage();
     await loginPage.login(
-      process.env.RUDDERSTACK_USERNAME!,
-      process.env.Rudderstack_PASSWORD!
+      username,
+      password
     );
     await loginPage.handleSequentialPostLogin();
     await loginPage.verifyLoginSuccess();
@@ -54,7 +56,7 @@ const username = process.env.RUDDERSTACK_USERNAME;
     await browser.close();
 
   } catch (error) {
-    console.error('Cucumber global setup failed!');
+    console.error('Cucumber global setup failed!', error);
     if (page) await page.screenshot({ path: `cucumber-setup-failure.png` });
     if (browser) await browser.close();
     throw error;
