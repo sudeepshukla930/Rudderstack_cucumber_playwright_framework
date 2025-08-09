@@ -1,0 +1,30 @@
+{
+  "name": "rudderstack-assignment",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test:dev-ui-cucumber": "npx cross-env E2E_ENV=development npx cucumber-js --config=cucumber.js",
+    "test:dev-api-spec": "npx cross-env E2E_ENV=development npx playwright test tests/api/rudderstack.spec.ts",
+    "test:dev-ui-spec": "npx cross-env  E2E_ENV=development npx playwright test tests/ui/connections.spec.ts",
+    "debug:dev-ui-spec": "npx cross-env PWDEBUG=1 E2E_ENV=development npx playwright test tests/ui/connections.spec.ts",
+    "test:dev-ui-spec-headed": "npx cross-env E2E_ENV=development HEADLESS=false npx playwright test tests/ui/connections.spec.ts",
+  
+    "test:qa-ui-cucumber": "npx cross-env E2E_ENV=qa npx cucumber-js --config=cucumber.js",
+    "test:qa-ui-headed": "npx cross-env E2E_ENV=qa HEADLESS=false npx playwright test tests/ui/connections.spec.ts",
+    
+    "postinstall": "npx playwright install --with-deps"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.1.0",
+    "@playwright/test": "^1.54.2",
+    "@types/node": "^24.2.0",
+    "cross-env": "^10.0.0",
+    "dotenv": "^17.2.1",
+    "ts-node": "^10.9.2",
+    "uuid": "^11.1.0"
+  }
+}
