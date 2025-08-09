@@ -28,6 +28,11 @@ BeforeAll(async function () {
     context = await browser.newContext();
     page = await context.newPage();
     const loginPage = new LoginPage(page);
+    console.log('--- Debugging Environment Variables in hooks.ts 22 ---');
+console.log(`RUDDERSTACK_USERNAME (from process.env): ${process.env.RUDDERSTACK_USERNAME}`);
+console.log(`RUDDERSTACK_PASSWORD (from process.env): ${process.env.RUDDERSTACK_PASSWORD}`);
+console.log(`RUDDERSTACK_WRITE_KEY (from process.env): ${process.env.RUDDERSTACK_WRITE_KEY}`);
+console.log(`RUDDERSTACK_DATAPLANE_URL (from process.env): ${process.env.RUDDERSTACK_DATAPLANE_URL}`);
 const username = process.env.RUDDERSTACK_USERNAME;
     const password = process.env.RUDDERSTACK_PASSWORD;
 
