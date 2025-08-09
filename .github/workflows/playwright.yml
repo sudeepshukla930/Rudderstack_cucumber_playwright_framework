@@ -1,27 +1,139 @@
-name: Playwright Tests
+# .github/workflows/ci.yml
+
+name: E2E Tests CI # Name of the workflow
+
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main # Trigger the workflow on pushes to the 'main' branch
   pull_request:
-    branches: [ main, master ]
+    branches:
+      - main # Trigger the workflow on pull requests targeting the 'main' branch
+  # schedule:
+  #   # Run daily at 00:00 UTC
+  #   - cron: '0 0 * * *' # This will run the workflow every day at midnight (UTC)
+  
+  workflow_dispatch: # This allows manual triggering of the workflow from GitHub UI
+    inputs:
+      environment:
+        description: 'Which environment to run tests against?' # Description shown in UI
+        required: true
+        default: 'development' # Default selection
+        type: choice # Type of input
+        options: # Available options for selection
+          - development
+          - qa
+
 jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
+  # Job to run tests in the Development Environment
+  e2e-dev-tests:
+    # This job will run if 'development' is selected or if triggered by push/pull_request/schedule
+    if: |
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.environment == 'development'
+    timeout-minutes: 15 # Set a maximum timeout for the job
+    runs-on: ubuntu-latest # Specify the runner environment
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - name: Checkout code
+      uses: actions/checkout@v4 # Check out your repository code
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
+        node-version: '20' # Specify Node.js version
+
+    - name: Install npm dependencies
+      run: npm install # Install project dependencies
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps # Install browser binaries
+
+    - name: Run E2E Cucumber UI Tests (Development)
+      # Pass environment variables securely to the test run from GitHub Secrets.
+      env:
+        RUDDERSTACK_USERNAME: ${{ secrets.RUDDERSTACK_DEV_USERNAME }}
+        RUDDERSTACK_PASSWORD: ${{ secrets.RUDDERSTACK_DEV_PASSWORD }}
+        RUDDERSTACK_WRITE_KEY: ${{ secrets.RUDDERSTACK_DEV_WRITE_KEY }}
+        RUDDERSTACK_DATAPLANE_URL: ${{ secrets.RUDDERSTACK_DEV_DATAPLANE_URL }}
+        E2E_ENV: development # Specify the environment to load .env.development
+        HEADLESS: true # Always run in headless mode in CI
+      run: npm run test:dev-ui-cucumber # Execute the defined npm script
+
+    - name: Upload Test Reports (HTML) - Dev
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cucumber-html-report-dev
+        path: test-results/cucumber-report.html
+
+    - name: Upload Test Reports (JSON) - Dev
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cucumber-json-report-dev
+        path: test-results/cucumber-report.json
+
+    - name: Upload Test Videos - Dev
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-videos-dev
+        path: test-results/videos/
+
+  # Job to run tests in the QA Environment
+  e2e-qa-tests:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    # This job will run if 'qa' is selected or if triggered by push/pull_request/schedule
+    if: |
+      github.event_name != 'workflow_dispatch' || 
+      github.event.inputs.environment == 'qa'
+    # Removed 'needs' dependency here, as jobs run conditionally based on input
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install npm dependencies
+      run: npm install
+
+    - name: Install Playwright browsers
       run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
+
+    - name: Run E2E Cucumber UI Tests (QA)
+      # Pass QA-specific environment variables from GitHub Secrets.
+      env:
+        RUDDERSTACK_USERNAME: ${{ secrets.RUDDERSTACK_QA_USERNAME }}
+        RUDDERSTACK_PASSWORD: ${{ secrets.RUDDERSTACK_QA_PASSWORD }}
+        RUDDERSTACK_WRITE_KEY: ${{ secrets.RUDDERSTACK_QA_WRITE_KEY }}
+        RUDDERSTACK_DATAPLANE_URL: ${{ secrets.RUDDERSTACK_QA_DATAPLANE_URL }}
+        E2E_ENV: qa # Specify the environment to load .env.qa
+        HEADLESS: true
+      run: npm run test:qa-ui-cucumber # Execute the npm script for QA Cucumber tests
+
+    - name: Upload Test Reports (HTML) - QA
+      uses: actions/upload-artifact@v4
+      if: always()
       with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+        name: cucumber-html-report-qa
+        path: test-results/cucumber-report.html
+
+    - name: Upload Test Reports (JSON) - QA
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: cucumber-json-report-qa
+        path: test-results/cucumber-report.json
+
+    - name: Upload Test Videos - QA
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: e2e-test-videos-qa
+        path: test-results/videos/
