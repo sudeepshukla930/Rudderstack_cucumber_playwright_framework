@@ -4,12 +4,6 @@ import { LoginPage } from '../../../page-objects/login-page';
 const fs = require('fs');
 require('dotenv').config(); // Ensure this is at the very top
 
-// --- Add these lines for debugging ---
-console.log('--- Debugging Environment Variables in hooks.ts ---');
-console.log(`RUDDERSTACK_USERNAME (from process.env): ${process.env.RUDDERSTACK_USERNAME}`);
-console.log(`RUDDERSTACK_PASSWORD (from process.env): ${process.env.RUDDERSTACK_PASSWORD}`);
-console.log(`RUDDERSTACK_WRITE_KEY (from process.env): ${process.env.RUDDERSTACK_WRITE_KEY}`);
-console.log(`RUDDERSTACK_DATAPLANE_URL (from process.env): ${process.env.RUDDERSTACK_DATAPLANE_URL}`);
 setDefaultTimeout(60 * 1000);
 
 let browser: Browser;
@@ -28,19 +22,15 @@ BeforeAll(async function () {
     context = await browser.newContext();
     page = await context.newPage();
     const loginPage = new LoginPage(page);
-    console.log('--- Debugging Environment Variables in hooks.ts 22 ---');
-console.log(`RUDDERSTACK_USERNAME (from process.env): ${process.env.RUDDERSTACK_USERNAME}`);
-console.log(`RUDDERSTACK_PASSWORD (from process.env): ${process.env.RUDDERSTACK_PASSWORD}`);
-console.log(`RUDDERSTACK_WRITE_KEY (from process.env): ${process.env.RUDDERSTACK_WRITE_KEY}`);
-console.log(`RUDDERSTACK_DATAPLANE_URL (from process.env): ${process.env.RUDDERSTACK_DATAPLANE_URL}`);
-const username = process.env.RUDDERSTACK_USERNAME;
+    
+    const username = process.env.RUDDERSTACK_USERNAME;
     const password = process.env.RUDDERSTACK_PASSWORD;
 
     if (!username || !password) {
       throw new Error("Rudderstack username or password environment variables are not set.");
     }
-    console.log(`RUDDERSTACK_USERNAME (from username variable): ${username}`);
-console.log(`RUDDERSTACK_PASSWORD (from password variable): ${password}`);
+
+    
     await loginPage.navigateToLoginPage();
     await loginPage.login(
       username,

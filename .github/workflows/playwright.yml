@@ -52,10 +52,10 @@ jobs:
     - name: Run E2E Cucumber UI Tests (Development)
       # Pass environment variables securely to the test run from GitHub Secrets.
       env:
-        RUDDERSTACK_USERNAME: ${{ vars.RUDDERSTACK_DEV_USERNAME }}
-        RUDDERSTACK_PASSWORD: ${{ vars.RUDDERSTACK_DEV_PASSWORD }}
-        RUDDERSTACK_WRITE_KEY: ${{ vars.RUDDERSTACK_DEV_WRITE_KEY }}
-        RUDDERSTACK_DATAPLANE_URL: ${{ vars.RUDDERSTACK_DEV_DATAPLANE_URL }}
+        RUDDERSTACK_USERNAME: ${{ secrets.RUDDERSTACK_DEV_USERNAME }}
+        RUDDERSTACK_PASSWORD: ${{ secrets.RUDDERSTACK_DEV_PASSWORD }}
+        RUDDERSTACK_WRITE_KEY: ${{ secrets.RUDDERSTACK_DEV_WRITE_KEY }}
+        RUDDERSTACK_DATAPLANE_URL: ${{ secrets.RUDDERSTACK_DEV_DATAPLANE_URL }}
         E2E_ENV: development # Specify the environment to load .env.development
         HEADLESS: true # Always run in headless mode in CI
       run: npm run test:dev-ui-cucumber # Execute the defined npm script
