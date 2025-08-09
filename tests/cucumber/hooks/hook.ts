@@ -2,7 +2,14 @@ import { BeforeAll, AfterAll, setDefaultTimeout, Before, After, ITestCaseHookPar
 import { chromium, firefox, webkit, Browser, Page, BrowserContext } from '@playwright/test';
 import { LoginPage } from '../../../page-objects/login-page';
 const fs = require('fs');
+require('dotenv').config(); // Ensure this is at the very top
 
+// --- Add these lines for debugging ---
+console.log('--- Debugging Environment Variables in hooks.ts ---');
+console.log(`RUDDERSTACK_USERNAME (from process.env): ${process.env.RUDDERSTACK_USERNAME}`);
+console.log(`RUDDERSTACK_PASSWORD (from process.env): ${process.env.RUDDERSTACK_PASSWORD}`);
+console.log(`RUDDERSTACK_WRITE_KEY (from process.env): ${process.env.RUDDERSTACK_WRITE_KEY}`);
+console.log(`RUDDERSTACK_DATAPLANE_URL (from process.env): ${process.env.RUDDERSTACK_DATAPLANE_URL}`);
 setDefaultTimeout(60 * 1000);
 
 let browser: Browser;
